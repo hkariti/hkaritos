@@ -99,21 +99,23 @@ p_next_cmd:
 	add sp, 4
 	
 p_skip_cmd:
-	cmp byte [di], 0
-	jz p_skip_end
-	inc di
-	jmp p_skip_cmd
+	mov al, 0
+	mov cx, 0xffff
+	repne scasb
 
 p_skip_end:
-	inc di
 	mov ax, [di]
 	cmp ax, 0
 	jz p_unk
 	add di, 2
 	jmp p_next_cmd
+
 p_run:
 	add sp, 4
-	mov ax, [di+1]
+	mov al, 0
+	mov cx, 0xffff
+	repne scasb
+	mov ax, [di]
 	jmp ax
 
 p_unk:
@@ -146,6 +148,9 @@ getc:
 
 puts:
 	mov bp, sp
+	push si
+	push ax
+	push bx
 	mov si, [bp+2]
 puts_l:
 	mov ah, 0x0e
@@ -157,20 +162,30 @@ puts_l:
 	jmp puts_l
 
 puts_end:
+	pop bx
+	pop ax
+	pop si
 	mov sp, bp
 	ret
 
 putc:
 	mov bp, sp
+	push ax
+	push bx
 	mov ax, [bp+2]
 	mov ah, 0x0e
 	mov bh, 0
 	int 10h
+	pop bx
+	pop ax
 	mov sp, bp
 	ret
 
 strcmp:
 	mov bp, sp
+	push si
+	push di
+	push ax
 	mov si, [bp+2]
 	mov di, [bp+4]
 strcmp_l:
@@ -190,6 +205,9 @@ strcmp_l:
 	jmp strcmp_l
 
 strcmp_end:
+	pop ax
+	pop di
+	pop si
 	ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
