@@ -92,8 +92,8 @@ handle_newline:
 parse:
 	mov di, cmds
 p_next_cmd:
-	push 0x2000
 	push di
+	push 0x2000
 	call strcmp
 	jz p_run
 	add sp, 4
