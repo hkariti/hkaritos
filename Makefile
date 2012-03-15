@@ -7,9 +7,9 @@ all: disk1
 	#pkill qemu; exit 0
 
 disk1: read.boot hello.boot
-	dd if=read.boot of=disk1 conv=notrunc
-	dd if=hello.boot of=disk1 conv=notrunc seek=1
-	/bin/echo -ne "\x55\xaa" | dd bs=1 seek=510 of=disk1
+	dd if=read.boot of=disk1 conv=sync
+	dd if=hello.boot of=disk1 conv=notrunc,sync seek=1
+	/bin/echo -ne "\x55\xaa" | dd bs=1 seek=510 of=disk1 conv=notrunc
 
 read.boot: read.s
 	nasm read.s -o read.boot 
