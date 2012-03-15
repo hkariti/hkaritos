@@ -9,6 +9,7 @@ all: disk1
 disk1: read.boot hello.boot
 	dd if=read.boot of=disk1 conv=notrunc
 	dd if=hello.boot of=disk1 conv=notrunc seek=1
+	/bin/echo -ne "\x55\xaa" | dd bs=1 seek=510 of=disk1
 
 read.boot: read.s
 	nasm read.s -o read.boot 
