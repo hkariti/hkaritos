@@ -3,13 +3,13 @@
 org 7c00h
 
 start:
-	mov al, 1
-	mov ah, 2h
-	mov bx, 1000h
-	mov cl, 2
-	mov ch, 0
-	mov dl, 80h
-	mov dh, 0
+	mov ah, 2h ; Function; 2h reads sectors from drive
+	mov al, 1 ; Number of sectors
+	mov bx, 1000h ; Buffer pointer
+	mov dl, 80h ; Drive number. 80h is the first hard drive
+	mov dh, 0 ; Head
+	mov ch, 0 ; Track
+	mov cl, 2 ; Track/Sector
 	int 13h
 	jc read_error
 	jmp bx
