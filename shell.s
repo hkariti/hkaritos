@@ -147,9 +147,9 @@ getc:
 	ret
 
 puts:
+	push bp
 	mov bp, sp
 	push si
-	push ax
 	push bx
 	mov si, [bp+2]
 puts_l:
@@ -163,36 +163,37 @@ puts_l:
 
 puts_end:
 	pop bx
-	pop ax
 	pop si
-	mov sp, bp
+	leave
 	ret
 
 putc:
+	push bp
 	mov bp, sp
-	push ax
 	push bx
+
 	mov ax, [bp+2]
 	mov ah, 0x0e
 	mov bh, 0
 	int 10h
+
 	pop bx
-	pop ax
-	mov sp, bp
+	leave
 	ret
 
 strcmp:
+	push bp
 	mov bp, sp
 	push si
 	push di
-	push ax
+
 	mov si, [bp+2]
 	mov di, [bp+4]
 strcmp_l:
 	mov al, [si]
 	mov ah, [di]
 ; End when strings differ
-	cmp al, ah
+	sub al, ah
 	jnz strcmp_end
 
 ; End when the strings end
@@ -205,9 +206,9 @@ strcmp_l:
 	jmp strcmp_l
 
 strcmp_end:
-	pop ax
 	pop di
 	pop si
+	leave
 	ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
