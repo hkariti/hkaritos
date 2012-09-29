@@ -21,13 +21,11 @@ loader.boot: loader.s
 shell.o: shell.s
 	nasm shell.s -f elf -o shell.o
 
-test.c: shell.h
-
-test.o: test.c
+test.o: test.c test.h
 	gcc -m32 -c test.c -fno-builtin  -nostdlib -o test.o
 
-shell.boot: shell.o test.o
+shell.boot: shell.o test.o link.ld
 	ld -T link.ld -m elf_i386 -o shell.boot shell.o test.o
 
 clean:
-	rm -f disk1 loader.boot shell.boot
+	rm -f disk1 *.o *.boot
