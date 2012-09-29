@@ -18,9 +18,13 @@ disk1: loader.boot shell.boot
 loader.boot: loader.s
 	nasm loader.s -o loader.boot 
 
-shell.o: shell.s test.s
+shell.o: shell.s
 	nasm shell.s -f elf -o shell.o
-	nasm test.s -f elf -o test.o
+
+test.c: shell.h
+
+test.o: test.c
+	gcc -m32 -c test.c -fno-builtin  -nostdlib -o test.o
 
 shell.boot: shell.o test.o
 	ld -T link.ld -m elf_i386 -o shell.boot shell.o test.o

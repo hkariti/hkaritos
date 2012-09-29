@@ -8,9 +8,11 @@ global _start
 bits 16
 
 _start:
-	push hello_s
-	call puts
-	add sp, 2
+	mov ax, ds
+	mov ss, ax
+	push dword hello_s
+	call dword puts
+	add sp, 4
 	jmp prompt
 	
 halt:
@@ -23,20 +25,22 @@ halt:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 prompt:
-	push prompt_s
-	call puts
-	add sp, 2
+	push dword prompt_s
+	call dword puts
+	add sp, 4
 
-	call testfunc
+	call dword testfunc
+	push eax
+	call dword putc
 
 ; reset di
 	mov di, 0x2000
 
-	call read_line
+	call dword read_line
 	jmp prompt
 
 read_line:
-	call getc
+	call dword getc
 
 ; Handle special keys before printing
 	cmp al, 0x08 ; Backspace
@@ -46,14 +50,14 @@ read_line:
 
 ; Print and store as a string
 rl_print:
-	push ax
-	call putc
-	add sp, 2
+	push eax
+	call dword putc
+	add sp, 4
 	stosb
 	jmp read_line
 	
 rl_end:
-	ret
+	o32 ret
 			
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;       Special Keys Handlers         ;;
@@ -65,9 +69,9 @@ handle_backspace:
 	jz read_line	
 	
 ; Remove the last char from the screen
-	push back_s
-	call puts
-	add sp, 2
+	push dword back_s
+	call dword puts
+	add sp, 4
 
 ; Remove the last char from the string
 	dec di
@@ -77,9 +81,9 @@ handle_backspace:
 
 handle_newline:
 ; Print a newline
-	push newline_s
-	call puts
-	add sp, 2
+	push dword newline_s
+	call dword puts
+	add sp, 4
 
 ; Don't parse empty lines
 	cmp di, 0x2000
@@ -87,7 +91,7 @@ handle_newline:
 
 ; End the string and parse it
 	mov byte [di], 0
-	call parse
+	call dword parse
 
 ; End the line processing
 	jmp rl_end
@@ -100,11 +104,12 @@ handle_newline:
 parse:
 	mov di, cmds
 p_next_cmd:
-	push di
-	push 0x2000
-	call strcmp
+	push edi
+	push dword 0x2000
+	call dword strcmp
+	add sp, 8
+	cmp al, 0
 	jz p_run
-	add sp, 4
 	
 p_skip_cmd:
 	mov al, 0
@@ -119,7 +124,6 @@ p_skip_end:
 	jmp p_next_cmd
 
 p_run:
-	add sp, 4
 	mov al, 0
 	mov cx, 0xffff
 	repne scasb
@@ -127,20 +131,20 @@ p_run:
 	jmp ax
 
 p_unk:
-	push 0x2000
-	call puts
-	add sp, 2
-	push unk_s
-	call puts
-	add sp, 2
+	push dword 0x2000
+	call dword puts
+	add sp, 4
+	push dword unk_s
+	call dword puts
+	add sp, 4
 
 p_end:
-	ret
+	o32 ret
 
 help_cmd:
-	push help_s
-	call puts
-	add sp, 2
+	push dword help_s
+	call dword puts
+	add sp, 4
 	jmp p_end
 
 
@@ -152,14 +156,14 @@ getc:
 ; Read from keyboard and handle the key pressed
 	mov ah, 0
 	int 0x16
-	ret
+	o32 ret
 
 puts:
-	push bp
-	mov bp, sp
-	push si
+	push ebp
+	mov ebp, esp
 	push bx
-	mov si, [bp+4]
+
+	mov esi, [ebp+8]
 puts_l:
 	mov ah, 0x0e
 	mov bh, 0
@@ -171,32 +175,29 @@ puts_l:
 
 puts_end:
 	pop bx
-	pop si
-	leave
-	ret
+	o32 leave
+	o32 ret
 
 putc:
-	push bp
+	push ebp
 	mov bp, sp
 	push bx
 
-	mov ax, [bp+4]
+	mov eax, [bp+8]
 	mov ah, 0x0e
 	mov bh, 0
 	int 10h
 
 	pop bx
-	leave
-	ret
+	o32 leave
+	o32 ret
 
 strcmp:
-	push bp
+	push ebp
 	mov bp, sp
-	push si
-	push di
 
-	mov si, [bp+4]
-	mov di, [bp+6]
+	mov esi, [bp+8]
+	mov edi, [bp+12]
 strcmp_l:
 	mov al, [si]
 	mov ah, [di]
@@ -214,10 +215,8 @@ strcmp_l:
 	jmp strcmp_l
 
 strcmp_end:
-	pop di
-	pop si
-	leave
-	ret
+	o32 leave
+	o32 ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ; Generic strings     ;;
@@ -247,6 +246,6 @@ c_unk: dw 0
 
 
 help_s: db "Welcome to my shell. Commands:", 13, 10
-	db "help                 Show this message", 13, 10, 0
+	db "help                 Show this message", 13, 10, 0, 0,0
 
 
