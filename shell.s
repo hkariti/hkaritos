@@ -2,7 +2,12 @@
 
 org 0x1000
 
-start:
+extern testfunc
+global puts
+global _start
+;bits 32
+
+_start:
 	push hello_s
 	call puts
 	add sp, 2
@@ -21,6 +26,9 @@ prompt:
 	push prompt_s
 	call puts
 	add sp, 2
+
+	;call testfunc
+
 ; reset di
 	mov di, 0x2000
 
@@ -151,7 +159,7 @@ puts:
 	mov bp, sp
 	push si
 	push bx
-	mov si, [bp+2]
+	mov si, [bp+4]
 puts_l:
 	mov ah, 0x0e
 	mov bh, 0
@@ -172,7 +180,7 @@ putc:
 	mov bp, sp
 	push bx
 
-	mov ax, [bp+2]
+	mov ax, [bp+4]
 	mov ah, 0x0e
 	mov bh, 0
 	int 10h
@@ -187,8 +195,8 @@ strcmp:
 	push si
 	push di
 
-	mov si, [bp+2]
-	mov di, [bp+4]
+	mov si, [bp+4]
+	mov di, [bp+6]
 strcmp_l:
 	mov al, [si]
 	mov ah, [di]
