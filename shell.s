@@ -27,7 +27,7 @@ prompt:
 	call puts
 	add sp, 2
 
-	;call testfunc
+	call testfunc
 
 ; reset di
 	mov di, 0x2000

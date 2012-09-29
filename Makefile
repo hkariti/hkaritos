@@ -18,8 +18,12 @@ disk1: loader.boot shell.boot
 loader.boot: loader.s
 	nasm loader.s -o loader.boot 
 
-shell.boot: shell.s
-	nasm shell.s -o shell.boot
+shell.o: shell.s test.s
+	nasm shell.s -f elf -o shell.o
+	nasm test.s -f elf -o test.o
+
+shell.boot: shell.o test.o
+	ld -T link.ld -m elf_i386 -o shell.boot shell.o test.o
 
 clean:
 	rm -f disk1 loader.boot shell.boot
