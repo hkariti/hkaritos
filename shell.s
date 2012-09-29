@@ -1,11 +1,11 @@
 ; vim:syntax=nasm
 
-org 0x1000
+;org 0x1000
 
 extern testfunc
 global puts
 global _start
-;bits 32
+bits 16
 
 _start:
 	push hello_s
