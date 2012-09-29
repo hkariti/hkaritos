@@ -4,7 +4,11 @@
 
 extern testfunc
 global puts
+global strcmp
+global putc
+global getc
 global _start
+
 bits 16
 
 _start:
@@ -30,8 +34,6 @@ prompt:
 	add sp, 4
 
 	call dword testfunc
-	push eax
-	call dword putc
 
 ; reset di
 	mov di, 0x2000
@@ -202,7 +204,7 @@ strcmp_l:
 	mov al, [si]
 	mov ah, [di]
 ; End when strings differ
-	sub al, ah
+	cmp al, ah
 	jnz strcmp_end
 
 ; End when the strings end
@@ -215,6 +217,7 @@ strcmp_l:
 	jmp strcmp_l
 
 strcmp_end:
+	and eax, 0x00ff ; Clear the high part of eax
 	o32 leave
 	o32 ret
 

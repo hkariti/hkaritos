@@ -21,7 +21,7 @@ loader.boot: loader.s
 shell.o: shell.s
 	nasm shell.s -f elf -o shell.o
 
-test.o: test.c test.h
+test.o: test.c shell.h
 	gcc -m32 -c test.c -fno-builtin  -nostdlib -o test.o
 
 shell.boot: shell.o test.o link.ld
