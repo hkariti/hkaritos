@@ -3,7 +3,9 @@
 ;org 0x1000
 
 extern read_line
+extern parse
 
+global cmds
 global puts
 global strcmp
 global putc
@@ -35,69 +37,22 @@ prompt:
 	add sp, 4
 
 	call dword read_line
+
 	push eax
 	call dword parse
-	sub esp, 4
+	add esp, 4
+	
 	jmp prompt
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;       Command Parsers             ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-parse:
-	push ebp
-	mov ebp, esp
-
-; Skip empty commands
-	mov eax, [ebp+8]
-	cmp word [eax], 0
-	jz p_end
-
-	mov di, cmds
-p_next_cmd:
-	push edi
-	push dword [ebp+8]
-	call dword strcmp
-	add sp, 8
-	cmp al, 0
-	jz p_run
-	
-p_skip_cmd:
-	mov al, 0
-	mov cx, 0xffff
-	repne scasb
-
-p_skip_end:
-	mov ax, [di]
-	cmp ax, 0
-	jz p_unk
-	add di, 2
-	jmp p_next_cmd
-
-p_run:
-	mov al, 0
-	mov cx, 0xffff
-	repne scasb
-	mov ax, [di]
-	jmp ax
-
-p_unk:
-	push dword 0x2000
-	call dword puts
-	add sp, 4
-	push dword unk_s
-	call dword puts
-	add sp, 4
-
-p_end:
-	o32 leave
-	o32 ret
-
 help_cmd:
 	push dword help_s
 	call dword puts
 	add sp, 4
-	jmp p_end
+	o32 ret
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -188,11 +143,11 @@ unk_s: db ": unknown command", 13, 10, 0
 
 cmds:
 c_help: db "help", 0
-p_help: dw help_cmd
+p_help: dw help_cmd, 0
 c_exit: db "exit", 0
-p_exit: dw help_cmd
+p_exit: dw help_cmd, 0
 c_ls: db "ls", 0
-p_ls: dw help_cmd
+p_ls: dw help_cmd, 0
 c_unk: dw 0
 
 
