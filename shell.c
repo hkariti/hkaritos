@@ -1,5 +1,7 @@
 #include "shell.h"
+#define NULL 0
 #define COMMAND_STR_BASE ((char*)0x2000)
+#define NUM_OF_COMMANDS (3)
 
 
 char* read_line() {
@@ -13,7 +15,7 @@ char* read_line() {
 			i--;
 			puts("\b \b");
 		}
-		else {
+		else { // Add the read chars to a string and print them one by one 
 			*(cmd+i) = c;
 			i++;
 			putc(c);
@@ -34,34 +36,28 @@ int strlen(char* s) {
 	return i;
 }
 
-void parse(char* cmd) {
-	char* cur;
-	void** ptr = 0;
-	extern void* cmds;
+void parse(char* user_cmd) {
+	struct cmd_entry commands[NUM_OF_COMMANDS] = {
+		{"help", &help_cmd},
+		{"exit", &help_cmd},
+		{"ls", &help_cmd},
+	};
 
-	unsigned int l;
+	unsigned int i = 0;
 
-	if (*cmd == 0) return; // Skip empty commands
+	if (*user_cmd == NULL) return; // Skip empty commands
 
-	cur = (char*)cmds;
-	puts(cmds);
-	while (*cur) { // Loop until we reach the end of the command list
-		l = strlen(cur);
-		if (strcmp(cmd, cur) == 0) {
-			ptr = (void**)(cur + l + 1); // Set ptr to the command's address
-			(**(void (**)(void))ptr)(); // Call the function
+	while (i < NUM_OF_COMMANDS) {
+		if (strcmp(user_cmd, commands[i].name) == 0) {
+			(commands[i].ptr)(); // Call the function
 			return;
 		}
-		else {
-			cur += l + 1 + 4; // Skip the command name (l + 1) and the command's address (4)
-		}
+		i++;
 	}
 
-	puts(cmd);
+	// If we reach here, no command has matched
+	puts(user_cmd);
 	puts(": unknown command.\r\n");
 
 	return;
 }
-
-	
-

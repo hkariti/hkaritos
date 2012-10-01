@@ -5,6 +5,7 @@
 extern read_line
 extern parse
 
+global help_cmd
 global cmds
 global puts
 global strcmp
@@ -15,11 +16,13 @@ global _start
 bits 16
 
 _start:
-	mov ax, ds
+	mov ax, 0
+	mov ds, ax
 	mov ss, ax
 	push dword hello_s
 	call dword puts
 	add sp, 4
+	
 	jmp prompt
 	
 halt:
@@ -136,20 +139,6 @@ prompt_s: db "> ", 0
 back_s: db 8, ' ', 8, 0
 
 unk_s: db ": unknown command", 13, 10, 0
-
-;;;;;;;;;;;;;;;;;;;;;;;;;
-;;     Commands        ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;
-
-cmds:
-c_help: db "help", 0
-p_help: dw help_cmd, 0
-c_exit: db "exit", 0
-p_exit: dw help_cmd, 0
-c_ls: db "ls", 0
-p_ls: dw help_cmd, 0
-c_unk: dw 0
-
 
 
 
