@@ -3,6 +3,15 @@
 #define COMMAND_STR_BASE ((char*)0x2000)
 #define NUM_OF_COMMANDS (3)
 
+void prompt() {
+	char* line;
+
+	while (1) {
+		puts("> ");
+		line = read_line();
+		parse(line);
+	}
+}
 
 char* read_line() {
 	char c;
@@ -60,4 +69,9 @@ void parse(char* user_cmd) {
 	puts(": unknown command.\r\n");
 
 	return;
+}
+
+void help_cmd() {
+	puts("Welcome to my shell. Commands:\r\n");
+	puts("help                      Show this message\r\n");
 }

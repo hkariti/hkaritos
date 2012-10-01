@@ -4,9 +4,8 @@
 
 extern read_line
 extern parse
+extern prompt
 
-global help_cmd
-global cmds
 global puts
 global strcmp
 global putc
@@ -23,39 +22,11 @@ _start:
 	call dword puts
 	add sp, 4
 	
-	jmp prompt
+	call prompt
 	
 halt:
 	cli
 	hlt
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;      Basic Shell Interface         ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-prompt:
-	push dword prompt_s
-	call dword puts
-	add sp, 4
-
-	call dword read_line
-
-	push eax
-	call dword parse
-	add esp, 4
-	
-	jmp prompt
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;       Command Parsers             ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-help_cmd:
-	push dword help_s
-	call dword puts
-	add sp, 4
-	o32 ret
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -135,14 +106,5 @@ strcmp_end:
 
 hello_s: db "Hello, world!"
 newline_s: db 13, 10, 0
-prompt_s: db "> ", 0
-back_s: db 8, ' ', 8, 0
-
-unk_s: db ": unknown command", 13, 10, 0
-
-
-
-help_s: db "Welcome to my shell. Commands:", 13, 10
-	db "help                 Show this message", 13, 10, 0, 0,0
 
 

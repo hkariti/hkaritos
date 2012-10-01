@@ -18,14 +18,14 @@ disk1: loader.boot shell.boot
 loader.boot: loader.s
 	nasm loader.s -o loader.boot 
 
-shell.o: shell.s
-	nasm shell.s -f elf -o shell.o
+shell.o: shell.c shell.h
+	gcc -m32 -c shell.c -fno-builtin  -nostdlib -o shell.o
 
-test.o: shell.c shell.h
-	gcc -m32 -c shell.c -fno-builtin  -nostdlib -o test.o
+boot.o: boot.s
+	nasm boot.s -f elf -o boot.o
 
 shell.boot: shell.o test.o link.ld
-	ld -T link.ld -m elf_i386 -o shell.boot shell.o test.o
+	ld -T link.ld -m elf_i386 -o shell.boot boot.o shell.o
 
 clean:
 	rm -f disk1 *.o *.boot
