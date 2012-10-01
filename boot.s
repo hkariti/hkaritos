@@ -2,8 +2,6 @@
 
 ;org 0x1000
 
-extern read_line
-extern parse
 extern prompt
 
 global puts
@@ -34,18 +32,21 @@ halt:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 getc:
-; Read from keyboard and handle the key pressed
+; Read and return one char from the keyboard
 	mov ah, 0
 	int 0x16
 	o32 ret
 
 puts:
+; Print a given string to the screen
 	push ebp
 	mov ebp, esp
 	push bx
 
-	mov esi, [ebp+8]
+	; First arg is a pointer to the string
+	mov esi, [ebp+8] 
 puts_l:
+; Print the string char by char until the NULL terminator
 	mov ah, 0x0e
 	mov bh, 0
 	lodsb
@@ -96,7 +97,7 @@ strcmp_l:
 	jmp strcmp_l
 
 strcmp_end:
-	and eax, 0x00ff ; Clear the high part of eax
+	and eax, 0xffff ; Clear the high part of eax
 	o32 leave
 	o32 ret
 

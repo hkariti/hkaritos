@@ -2,7 +2,7 @@
 
 all: disk1
 	if [ -x "`which qemu-system-i386`" ]; then \
-		qemu-system-i386 -hda disk1 ; \
+		qemu-system-i386 -s -hda disk1 ; \
 	else \
 		echo No qemu? ; \
 	fi
@@ -24,7 +24,7 @@ shell.o: shell.c shell.h
 boot.o: boot.s
 	nasm boot.s -f elf -o boot.o
 
-shell.boot: shell.o test.o link.ld
+shell.boot: shell.o boot.o link.ld
 	ld -T link.ld -m elf_i386 -o shell.boot boot.o shell.o
 
 clean:
