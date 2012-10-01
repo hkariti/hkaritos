@@ -9,7 +9,7 @@ int strlen(char* s) {
 }
 
 char* itoa(unsigned int n) {
-	char* str = (char*)0x3000;
+	static char str[MAX_NUM_STR_LEN+1];
 	unsigned int i = MAX_NUM_STR_LEN;
 	unsigned int d;
 

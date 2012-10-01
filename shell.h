@@ -1,9 +1,8 @@
 #include "common.h"
 
-#define COMMAND_STR_BASE ((char*)0x2000)
+#define MAX_CMDLINE_LENGTH (100)
 #define NUM_OF_COMMANDS (3)
 
-asm(".code16gcc\n");
 
 extern char getc();
 
@@ -18,7 +17,7 @@ struct cmd_entry {
 };
 
 void prompt();
-char* read_line();
+int read_line(char*, unsigned int);
 void parse(char*);
 void help_cmd();
 

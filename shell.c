@@ -2,37 +2,37 @@
 #include "string.h"
 
 void prompt() {
-	char* line;
+	char cmdline[MAX_CMDLINE_LENGTH];
 
 	while (1) {
 		puts("> ");
-		line = read_line();
-		parse(line);
+		if (read_line(cmdline, MAX_CMDLINE_LENGTH))
+			parse(cmdline);
 	}
 }
 
-char* read_line() {
+int read_line(char* cmdline, unsigned int maxlen) {
 	char c;
 	unsigned int i = 0;
-	char* cmd = COMMAND_STR_BASE;
 
-	while ( (c = getc() ) != 13 ) { // Read until newline
+	// Read until newline or end of allocated space
+	while ( (c = getc() ) != 13 && i < maxlen) { 
 		if (c == 0x08) { // Handle backspace
 			if (i == 0) continue;
 			i--;
 			puts("\b \b");
 		}
 		else { // Add the read chars to a string and print them one by one 
-			*(cmd+i) = c;
+			cmdline[i] = c;
 			i++;
 			putc(c);
 		}
 	}
 
-	*(cmd+i) = 0; // Add a NULL terminator
+	cmdline[i] = 0; // Add a NULL terminator
 
 	puts("\r\n");
-	return cmd;
+	return i;
 }
 
 void parse(char* user_cmd) {
@@ -45,7 +45,7 @@ void parse(char* user_cmd) {
 	unsigned int i = 0;
 	unsigned int ret;
 
-	if (*user_cmd == NULL) return; // Skip empty commands
+	if (!user_cmd || *user_cmd == NULL) return; // Skip empty commands
 
 	while (i < NUM_OF_COMMANDS) {
 		if ((ret = strcmp(commands[i].name, user_cmd) ) == 0) {
