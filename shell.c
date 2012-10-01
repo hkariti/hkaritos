@@ -1,8 +1,5 @@
 #include "shell.h"
-#define NULL 0
-#define COMMAND_STR_BASE ((char*)0x2000)
-#define NUM_OF_COMMANDS (3)
-#define ASCII_ZERO (48)
+#include "string.h"
 
 void prompt() {
 	char* line;
@@ -38,38 +35,6 @@ char* read_line() {
 	return cmd;
 }
 
-int strlen(char* s) {
-	unsigned int i = 0;
-
-	while (*(s+i)) i++;
-
-	return i;
-}
-
-char* itoa(unsigned int n) {
-	char* str = (char*)0x3000;
-	unsigned int i = 10;
-	int d = 0;
-
-	// Terminate the string first
-	str[i] = 0;
-	
-	// Handle special case for zero
-	if (n == 0) {
-		i--;
-		str[i] = ASCII_ZERO;
-	}
-
-	while (n > 0 && i > 0) {
-		i--;
-		d = n % 10;
-		n /= 10;
-		str[i] = (char)(ASCII_ZERO + d);
-	}
-
-	return str + i;
-}
-	
 void parse(char* user_cmd) {
 	struct cmd_entry commands[NUM_OF_COMMANDS] = {
 		{"help", &help_cmd},

@@ -1,3 +1,8 @@
+#include "common.h"
+
+#define COMMAND_STR_BASE ((char*)0x2000)
+#define NUM_OF_COMMANDS (3)
+
 asm(".code16gcc\n");
 
 extern char getc();
@@ -6,7 +11,6 @@ extern void puts(char* s);
 
 extern void putc(char c);
 
-extern int strcmp(char* s1, char* s2);
 
 struct cmd_entry {
 	char* name;
@@ -15,7 +19,6 @@ struct cmd_entry {
 
 void prompt();
 char* read_line();
-int strlen(char*);
 void parse(char*);
 void help_cmd();
 
