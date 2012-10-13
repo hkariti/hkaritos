@@ -42,6 +42,7 @@ puts:
 	push ebp
 	mov ebp, esp
 	push bx
+	mov ecx, 0 ; Counter for number of characters printed
 
 	; First arg is a pointer to the string
 	mov esi, [ebp+8] 
@@ -53,9 +54,11 @@ puts_l:
 	test al, al
 	jz puts_end
 	int 10h
+	inc ecx
 	jmp puts_l
 
 puts_end:
+	mov eax, ecx
 	pop bx
 	o32 leave
 	o32 ret

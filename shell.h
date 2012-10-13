@@ -6,7 +6,7 @@
 
 extern char getc();
 
-extern void puts(char* s);
+extern unsigned int puts(char* s);
 
 extern void putc(char c);
 

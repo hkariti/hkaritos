@@ -6,3 +6,4 @@
 extern int strcmp(char* s1, char* s2);
 int strlen(char*);
 char* itoa(unsigned int);
+int printf(char*, ...);

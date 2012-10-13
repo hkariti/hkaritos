@@ -36,7 +36,7 @@ int read_line(char* cmdline, unsigned int maxlen) {
 }
 
 void parse(char* user_cmd) {
-	struct cmd_entry commands[NUM_OF_COMMANDS] = {
+	struct cmd_entry commands[] = {
 		{"help", &help_cmd},
 		{"exit", &help_cmd},
 		{"ls", &help_cmd},
@@ -44,10 +44,11 @@ void parse(char* user_cmd) {
 
 	unsigned int i = 0;
 	unsigned int ret;
+	unsigned int num_of_commands = sizeof(commands)/sizeof(struct cmd_entry);
 
 	if (!user_cmd || *user_cmd == NULL) return; // Skip empty commands
 
-	while (i < NUM_OF_COMMANDS) {
+	while (i < num_of_commands) {
 		if ((ret = strcmp(commands[i].name, user_cmd) ) == 0) {
 			(commands[i].ptr)(); // Call the function
 			return;
@@ -63,6 +64,7 @@ void parse(char* user_cmd) {
 }
 
 void help_cmd() {
+	int n;
 	puts("Welcome to my shell. Commands:\r\n");
 	puts("help                      Show this message\r\n");
 }
