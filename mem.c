@@ -1,7 +1,7 @@
 #include "mem.h"
 
 void* malloc(unsigned int s) {
-	static void* base = BASE_ALLOC_ADDR;
+	static void* base = 0x5000;
 	void* alloc = base;
 
 	base+=s;

@@ -13,11 +13,18 @@ extern void putc(char c);
 
 struct cmd_entry {
 	char* name;
-	void (*ptr)(void);
+	void (*ptr)();
+};
+
+struct cmd_args {
+	unsigned int argc;
+	char** argv;
 };
 
 void prompt();
 int read_line(char*, unsigned int);
 void parse(char*);
-void help_cmd();
+void help_cmd(int, char**);
+void print_cmd(int, char**);
+struct cmd_args* split_cmd(char*);
 

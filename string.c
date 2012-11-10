@@ -8,6 +8,33 @@ int strlen(char* s) {
 	return i;
 }
 
+// Find a specific character in a string
+char* strchr(char* s, char c, unsigned int n) {
+	int i;
+
+	for (i = 0 ; i < n; i++) {
+		if (s[i] == c) return s+i;
+		if (s[i] == NULL) break;
+	}
+
+	return NULL;
+}
+
+char* strncpy(char* dest, char* src, unsigned int n) {
+	char* d = dest;
+
+	while (n > 0) {
+		*dest = *src;
+		if ( *src == NULL ) break;
+
+		src++;
+		dest++;
+		n--;
+	}
+
+	return dest;
+}
+
 char* itoa(unsigned int n, unsigned char base) {
 	static char str[MAX_NUM_STR_LEN+1];
 	unsigned int i = MAX_NUM_STR_LEN;

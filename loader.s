@@ -4,7 +4,7 @@ org 7c00h
 
 start:
 	mov ah, 2h ; Function; 2h reads sectors from drive
-	mov al, 4 ; Number of sectors
+	mov al, 6 ; Number of sectors
 	mov bx, 1000h ; Buffer pointer
 	mov dl, 80h ; Drive number. 80h is the first hard drive
 	mov dh, 0 ; Head

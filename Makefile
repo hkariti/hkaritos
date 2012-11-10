@@ -21,7 +21,7 @@ loader.boot: loader.s
 	nasm loader.s -o loader.boot 
 
 shell.o: shell.c shell.h common.h
-	gcc ${CFLAGS} -c shell.c shell.o
+	gcc ${CFLAGS} -c shell.c -o shell.o
 
 string.o: string.c string.h common.h
 	gcc ${CFLAGS} -c string.c -o string.o

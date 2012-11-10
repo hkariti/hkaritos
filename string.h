@@ -6,5 +6,7 @@
 
 extern int strcmp(char* s1, char* s2);
 int strlen(char*);
+char* strchr(char*, char, unsigned int);
+char* strncpy(char*, char*, unsigned int);
 char* itoa(unsigned int, unsigned char);
 int printf(char*, ...);
