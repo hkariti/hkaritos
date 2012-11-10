@@ -1,3 +1,5 @@
+CFLAGS := -m32 -fno-builtin -nostdlib
+
 .PHONY: all clean
 
 all: disk1
@@ -19,16 +21,19 @@ loader.boot: loader.s
 	nasm loader.s -o loader.boot 
 
 shell.o: shell.c shell.h common.h
-	gcc -m32 -c shell.c -fno-builtin  -nostdlib -o shell.o
+	gcc ${CFLAGS} -c shell.c shell.o
 
 string.o: string.c string.h common.h
-	gcc -m32 -c string.c -fno-builtin  -nostdlib -o string.o
+	gcc ${CFLAGS} -c string.c -o string.o
 
 boot.o: boot.s
 	nasm boot.s -f elf -o boot.o
 
-shell.boot: link.ld boot.o shell.o string.o
-	ld -T link.ld -m elf_i386 -o shell.boot boot.o shell.o string.o
+mem.o: mem.c mem.h common.h
+	gcc ${CFLAGS} -c mem.c -o mem.o
+
+shell.boot: link.ld boot.o shell.o string.o mem.o
+	ld -T link.ld -m elf_i386 -o shell.boot boot.o shell.o string.o mem.o
 
 clean:
 	rm -f disk1 *.o *.boot

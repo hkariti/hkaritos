@@ -1,10 +1,12 @@
 #include "shell.h"
 #include "string.h"
+#include "mem.h"
 
 void prompt() {
 	char cmdline[MAX_CMDLINE_LENGTH];
 
 	while (1) {
+		malloc(0x10);
 		puts("> ");
 		if (read_line(cmdline, MAX_CMDLINE_LENGTH))
 			parse(cmdline);
@@ -43,13 +45,12 @@ void parse(char* user_cmd) {
 	};
 
 	unsigned int i = 0;
-	unsigned int ret;
 	unsigned int num_of_commands = sizeof(commands)/sizeof(struct cmd_entry);
 
 	if (!user_cmd || *user_cmd == NULL) return; // Skip empty commands
 
 	while (i < num_of_commands) {
-		if ((ret = strcmp(commands[i].name, user_cmd) ) == 0) {
+		if (strcmp(commands[i].name, user_cmd)  == 0) {
 			(commands[i].ptr)(); // Call the function
 			return;
 		}

@@ -8,10 +8,12 @@ int strlen(char* s) {
 	return i;
 }
 
-char* itoa(unsigned int n) {
+char* itoa(unsigned int n, unsigned char base) {
 	static char str[MAX_NUM_STR_LEN+1];
 	unsigned int i = MAX_NUM_STR_LEN;
 	unsigned int d;
+
+	if (base != 10 && base != 16) return NULL;
 
 	// Terminate the string first
 	str[i] = 0;
@@ -25,9 +27,15 @@ char* itoa(unsigned int n) {
 	// Fill the numer backwards as a string (lowest digit to largest)
 	while (n > 0 && i > 0) {
 		i--;
-		d = n % 10;
-		n /= 10;
-		str[i] = (char)(ASCII_ZERO + d);
+		d = n % base ;
+		n /= base;
+		if (d < 10) {
+			str[i] = (char)(ASCII_ZERO + d);
+		}
+		else {
+			d -= 10; // 10 is like zero when we start counting from ascii 'a'
+			str[i] = (char)(ASCII_A + d);
+		}
 	}
 
 	return str + i;
@@ -51,7 +59,11 @@ int printf(char* fmt, ...) {
 		   i++;
 		   switch (fmt[i]) {
 			   case 'd':
-				   chars_printed += puts(itoa(*(int*)nextarg));
+				   chars_printed += puts(itoa(*(int*)nextarg, 10));
+				   nextarg+=sizeof(int);
+				   break;
+			   case 'x':
+				   chars_printed += puts(itoa(*(int*)nextarg, 16));
 				   nextarg+=sizeof(int);
 				   break;
 			   case 's':
