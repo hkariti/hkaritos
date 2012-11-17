@@ -143,13 +143,19 @@ void print_cmd(int argc, char** argv) {
 	ptr = (void*)atoi(argv[1], 16);
 
 	for (i=0; i<size; i++) {
+		// Print the address every 16 bytes
 		if (i % 16 == 0) printf("0x%4x: ", ptr+i);
+
 		printf("%2x ", *(unsigned char*)(ptr+i));
 
+		// Two spaces in the middle (8 bytes)
+		// New line after every 16 bytes
+		if (i % 16 == 7) puts(" "); 
 		if (i % 16 == 15) puts("\r\n");
-		if (i % 16 == 7) puts(" ");
 	}
-	printf("\r\n");
+
+	if (i % 16 > 0)
+		printf("\r\n");
 
 }
 

@@ -14,13 +14,14 @@ all: disk1
 	#vncviewer :0; exit 0
 	#pkill qemu; exit 0
 
-disk1: loader shell
+disk1: loader
 	dd if=loader of=disk1 conv=sync
 	dd if=shell of=disk1 conv=notrunc,sync seek=1
 	/bin/echo -ne "\x55\xaa" | dd bs=1 seek=510 of=disk1 conv=notrunc
 
-loader: ${SRCDIR}/loader.s
-	nasm ${SRCDIR}/loader.s -o loader
+loader: ${SRCDIR}/loader.s.m4 shell
+	m4 -DSHELL_SIZE=$(shell du --apparent-size -B 512 shell | awk '{print $$1}') ${SRCDIR}/loader.s.m4 > loader.s
+	nasm loader.s -o loader
 
 shell.o: ${SRCDIR}/shell.c ${INCLUDEDIR}/shell.h ${INCLUDEDIR}/common.h
 	gcc ${CFLAGS} -c ${SRCDIR}/shell.c -o shell.o
