@@ -39,4 +39,4 @@ shell: link.ld boot.o shell.o string.o mem.o
 	ld -T link.ld -m elf_i386 -o shell boot.o shell.o string.o mem.o
 
 clean:
-	rm -f disk1 *.o loader shell
+	rm -f disk1 *.o loader* shell 

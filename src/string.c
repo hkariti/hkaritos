@@ -113,7 +113,7 @@ unsigned int atoi2(char* str, char** endptr, unsigned char base) {
 int printf(char* fmt, ...) {
 	char* block_start_ptr;
 	char* field_ptr;
-	char* padding_ptr;
+	char padding_ptr[10];
 	char padding_chr;
 	unsigned int chars_printed = 0;
 	unsigned int field_min_len, field_len, padding_len;
@@ -129,8 +129,8 @@ int printf(char* fmt, ...) {
 		   *fmt = '%';
 		   fmt++;
 
-		   // Handle field length specifiers
-		   field_min_len = atoi2(fmt, &fmt, 10);
+		   // Handle field length specifiers. Limited to 9 chars for now.
+		   field_min_len = atoi2(fmt, &fmt, 10) % 10;
 
 		   // Handle each placeholder type
 		   switch (*fmt) {
@@ -161,10 +161,11 @@ int printf(char* fmt, ...) {
 		   field_len = strlen(field_ptr);
 		   if (field_min_len > field_len) {
 				   padding_len = field_min_len - field_len;
-				   padding_ptr = (char*)malloc(padding_len + 1);
+				  // padding_ptr = (char*)malloc(padding_len + 1);
 				   memset((void*)padding_ptr, padding_chr, padding_len);
+				   padding_ptr[padding_len] = NULL;
 				   chars_printed += puts(padding_ptr);
-				   free(padding_ptr);
+				   //free(padding_ptr);
 		   }
 
 		   // Print the field's content (padding was printed already)
