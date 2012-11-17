@@ -9,4 +9,7 @@ int strlen(char*);
 char* strchr(char*, char, unsigned int);
 char* strncpy(char*, char*, unsigned int);
 char* itoa(unsigned int, unsigned char);
+unsigned int atoi(char*, unsigned char);
+unsigned int atoi2(char*, char**, unsigned char);
 int printf(char*, ...);
+void* memset(void*, char, unsigned int);

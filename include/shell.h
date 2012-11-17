@@ -1,7 +1,7 @@
 #include "common.h"
 
 #define MAX_CMDLINE_LENGTH (100)
-#define NUM_OF_COMMANDS (3)
+#define MAX_ARGUMENTS_NUM (10)
 
 
 extern char getc();

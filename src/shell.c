@@ -2,6 +2,7 @@
 #include "string.h"
 #include "mem.h"
 
+// Prompt the user for a command
 void prompt() {
 	char cmdline[MAX_CMDLINE_LENGTH];
 
@@ -12,11 +13,12 @@ void prompt() {
 	}
 }
 
+// Split the cmdline into words and make the argv array
 struct cmd_args* split_cmd(char* cmd) {
 	struct cmd_args* args;
 	char* p;
 	unsigned int len, argc;
-	char* arg_list[10];
+	char* arg_list[MAX_ARGUMENTS_NUM];
 
 	// Allocate cmd_args struct
 	args = malloc(sizeof(struct cmd_args));
@@ -29,12 +31,12 @@ struct cmd_args* split_cmd(char* cmd) {
 	// Fill the internal argument list with the characters between the spaces
 	while ( (p = strchr(cmd, ' ', MAX_CMDLINE_LENGTH)) != NULL) {
 		len = p - cmd;
-		arg_list[argc] = malloc(len+1); // Extra byte for null terminator
+		arg_list[argc] = malloc(len+1); // Allocate extra byte for null terminator
 		strncpy(arg_list[argc], cmd, len);
-		*(arg_list[argc] + len) = NULL;
-		cmd = p+1;
+		*(arg_list[argc] + len) = NULL; // Set the NULL terminator
+		cmd = p+1; // Move the marker to the beginning of the next word
 		argc++;
-		if (argc == 10) return NULL; // Too many arguments
+		if (argc == MAX_ARGUMENTS_NUM) return NULL; // Too many arguments
 	}
 
 	// Fill the last argument, until the end of the string
@@ -56,6 +58,7 @@ struct cmd_args* split_cmd(char* cmd) {
 	return args;
 }
 
+// Read a single line from the keyboard
 int read_line(char* cmdline, unsigned int maxlen) {
 	char c;
 	unsigned int i = 0;
@@ -80,6 +83,7 @@ int read_line(char* cmdline, unsigned int maxlen) {
 	return i;
 }
 
+// Parse a command line and run the requested command
 void parse(char* user_cmd) {
 	struct cmd_entry commands[] = {
 		{"help", &help_cmd},
@@ -99,7 +103,7 @@ void parse(char* user_cmd) {
 
 	
 	while (i < num_of_commands) {
-		if (strcmp(commands[i].name, splitted_cmd->argv[0])  == 0) {
+		if (strcmp(commands[i].name, splitted_cmd->argv[0]) == 0) {
 			(commands[i].ptr)(splitted_cmd->argc, splitted_cmd->argv); // Call the function
 			return;
 		}
@@ -113,6 +117,7 @@ void parse(char* user_cmd) {
 	return;
 }
 
+
 void help_cmd(int argc, char** argv) {
 	int n;
 	puts("Welcome to my shell. Commands:\r\n");
@@ -120,11 +125,31 @@ void help_cmd(int argc, char** argv) {
 }
 
 void print_cmd(int argc, char** argv) {
-	printf("I have %d arguments.\r\n", argc);
-	printf("My name is %s.\r\n", argv[0]);
+	void* ptr;
+	int size = 16;
+	int i;
 
-	if (argc > 1) {
-		printf("My first argument is %s\r\n", argv[1]);
+	if (argc == 1) {
+		printf("Usage: %s ADDR [LENGTH]\r\n", argv[0]);
+		return;
 	}
+	if (argc > 2) size = atoi(argv[2], 10);
+
+	if (size == 0) {
+		printf("Invalid size: %d\r\n", size);
+		return;
+	}
+
+	ptr = (void*)atoi(argv[1], 16);
+
+	for (i=0; i<size; i++) {
+		if (i % 16 == 0) printf("0x%4x: ", ptr+i);
+		printf("%2x ", *(unsigned char*)(ptr+i));
+
+		if (i % 16 == 15) puts("\r\n");
+		if (i % 16 == 7) puts(" ");
+	}
+	printf("\r\n");
+
 }
 
