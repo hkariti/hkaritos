@@ -2,7 +2,7 @@
 #include "string.h"
 #include "mem.h"
 
-// Prompt the user for a command
+// Prompt the user for a command {{{1
 void prompt() {
 	char cmdline[MAX_CMDLINE_LENGTH];
 
@@ -13,7 +13,7 @@ void prompt() {
 	}
 }
 
-// Split the cmdline into words and make the argv array
+// Split the cmdline into words and make the argv array {{{1
 struct cmd_args* split_cmd(char* cmd) {
 	struct cmd_args* args;
 	char* p;
@@ -58,7 +58,7 @@ struct cmd_args* split_cmd(char* cmd) {
 	return args;
 }
 
-// Read a single line from the keyboard
+// Read a single line from the keyboard {{{1
 int read_line(char* cmdline, unsigned int maxlen) {
 	char c;
 	unsigned int i = 0;
@@ -83,13 +83,14 @@ int read_line(char* cmdline, unsigned int maxlen) {
 	return i;
 }
 
-// Parse a command line and run the requested command
+// Parse a command line and run the requested command {{{1
 void parse(char* user_cmd) {
 	struct cmd_entry commands[] = {
 		{"help", &help_cmd},
 		{"exit", &help_cmd},
 		{"ls", &help_cmd},
 		{"print", &print_cmd},
+		{"get_int", &get_int_cmd},
 	};
 
 	unsigned int num_of_commands = sizeof(commands)/sizeof(struct cmd_entry);
@@ -118,6 +119,7 @@ void parse(char* user_cmd) {
 }
 
 
+// Actual commands functions {{{1
 void help_cmd(int argc, char** argv) {
 	int n;
 	puts("Welcome to my shell. Commands:\r\n");
@@ -159,3 +161,18 @@ void print_cmd(int argc, char** argv) {
 
 }
 
+void get_int_cmd(int argc, char** argv) {
+	void *seg, *off, *ret;
+	unsigned char int_num;
+
+	if (argc != 2) {
+		printf("Usage: %s INT\r\n", argv[0]);
+		return;
+	}
+
+	int_num = atoi(argv[1], 10);
+	ret = get_int(int_num, &seg, &off);
+
+	printf("Int %d is at %x:%x\r\n", (int)int_num, (unsigned int)seg, (unsigned int)off);
+	return;
+}

@@ -78,6 +78,7 @@ unsigned int atoi(char* str, unsigned char base) {
 	return ret;
 }
 
+// Convert an ASCII string to a number and put the first non-number character in *endptr
 unsigned int atoi2(char* str, char** endptr, unsigned char base) {
 	unsigned int n = 0;
 

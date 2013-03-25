@@ -6,7 +6,7 @@ CFLAGS = -m32 -fno-builtin -nostdlib -I${INCLUDEDIR}
 
 all: disk1
 	if [ -x "`which qemu-system-i386`" ]; then \
-		qemu-system-i386 -s -hda disk1 ; \
+		qemu-system-i386 -no-kvm -s -hda disk1 ; \
 	else \
 		echo No qemu? ; \
 	fi
@@ -16,11 +16,11 @@ all: disk1
 
 disk1: loader
 	dd if=loader of=disk1 conv=sync
-	dd if=shell of=disk1 conv=notrunc,sync seek=1
+	dd if=main of=disk1 conv=notrunc,sync seek=1
 	/bin/echo -ne "\x55\xaa" | dd bs=1 seek=510 of=disk1 conv=notrunc
 
-loader: ${SRCDIR}/loader.s.m4 shell
-	m4 -DSHELL_SIZE=$(shell du --apparent-size -B 512 shell | awk '{print $$1}') ${SRCDIR}/loader.s.m4 > loader.s
+loader: ${SRCDIR}/loader.s.m4 main
+	m4 -DSHELL_SIZE=$(shell du --apparent-size -B 512 main | awk '{print $$1}') ${SRCDIR}/loader.s.m4 > loader.s
 	nasm loader.s -o loader
 
 shell.o: ${SRCDIR}/shell.c ${INCLUDEDIR}/shell.h ${INCLUDEDIR}/common.h
@@ -35,8 +35,14 @@ mem.o: ${SRCDIR}/mem.c ${INCLUDEDIR}/mem.h ${INCLUDEDIR}/common.h
 boot.o: ${SRCDIR}/boot.s
 	nasm ${SRCDIR}/boot.s -f elf -o boot.o
 
-shell: link.ld boot.o shell.o string.o mem.o
-	ld -T link.ld -m elf_i386 -o shell boot.o shell.o string.o mem.o
+aux.o: ${SRCDIR}/aux.s
+	nasm ${SRCDIR}/aux.s -f elf -o aux.o
+
+main.o: ${SRCDIR}/main.c
+	gcc ${CFLAGS} -c ${SRCDIR}/main.c -o main.o
+
+main: main.o link.ld aux.o boot.o shell.o string.o mem.o 
+	ld -T link.ld -m elf_i386 -o main boot.o main.o aux.o shell.o string.o mem.o
 
 clean:
 	rm -f disk1 *.o loader* shell 

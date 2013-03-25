@@ -2,13 +2,11 @@
 
 ;org 0x1000
 
+extern init
 extern prompt
 
-global puts
-global strcmp
-global putc
-global getc
-global _start
+global get_int
+global set_int
 
 bits 16
 
@@ -16,99 +14,68 @@ _start:
 	mov ax, 0
 	mov ds, ax
 	mov ss, ax
-	push dword hello_s
-	call dword puts
-	add sp, 4
-	
-	call prompt
+
+	call init
 	
 halt:
 	cli
 	hlt
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;     AUXILLARY FUNCS            ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-getc:
-; Read and return one char from the keyboard
-	mov ah, 0
-	int 0x16
-	o32 ret
-
-puts:
-; Print a given string to the screen
+setup_int:
+	; Set a new handler location for the requested interrupt
 	push ebp
 	mov ebp, esp
-	push bx
-	mov ecx, 0 ; Counter for number of characters printed
-
-	; First arg is a pointer to the string
-	mov esi, [ebp+8] 
-puts_l:
-; Print the string char by char until the NULL terminator
-	mov ah, 0x0e
-	mov bh, 0
-	lodsb
-	test al, al
-	jz puts_end
-	int 10h
-	inc ecx
-	jmp puts_l
-
-puts_end:
-	mov eax, ecx
-	pop bx
-	o32 leave
-	o32 ret
-
-putc:
-	push ebp
-	mov bp, sp
+	push di
+	push si
+	push dx
 	push bx
 
-	mov eax, [bp+8]
-	mov ah, 0x0e
-	mov bh, 0
-	int 10h
+	xor bx,bx
+	mov bl, [ebp+8] ; int number
+	mov si, [ebp+12] ; segment
+	mov di, [ebp+16] ; offset
+
+	shl bx, 2 ; IVT row
+	mov dx, [si] ; segment
+	mov [2 + bx], dx
+	mov dx, [di] ; offset
+	mov [0 + bx], dx
+
+	mov ax, bx ; return value
 
 	pop bx
-	o32 leave
+	pop dx
+	pop si
+	pop di
+	pop ebp
 	o32 ret
 
-strcmp:
+get_int:
+	; Read the location of the requeted interrupt's handler
 	push ebp
-	mov bp, sp
+	mov ebp, esp
+	push di
+	push si
+	push dx
+	push bx
+	
+	xor bx, bx
+	mov bl, [ebp+8] ; int number
+	mov si, [ebp+12] ; segment
+	mov di, [ebp+16] ; offset
 
-	mov esi, [bp+8]
-	mov edi, [bp+12]
-strcmp_l:
-	mov al, [si]
-	mov ah, [di]
-; End when strings differ
-	cmp al, ah
-	jnz strcmp_end
+	shl bx, 2 ; IVT row
+	mov dx, [2 + bx] ; segment
+	mov [si], dx
+	mov dx, [0 + bx] ; offset
+	mov [di], dx
+	
+	mov ax, bx ; return value
 
-; End when the strings end
-	cmp al, 0
-	jz strcmp_end
-
-; Move one char forward
-	inc di
-	inc si
-	jmp strcmp_l
-
-strcmp_end:
-	and eax, 0xffff ; Clear the high part of eax
-	o32 leave
+	pop bx
+	pop dx
+	pop si
+	pop di
+	pop ebp
 	o32 ret
-
-;;;;;;;;;;;;;;;;;;;;;;;;
-; Generic strings     ;;
-;;;;;;;;;;;;;;;;;;;;;;;;
-
-hello_s: db "Hello, world!"
-newline_s: db 13, 10, 0
-
-
