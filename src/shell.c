@@ -65,10 +65,6 @@ int read_line(char* cmdline, unsigned int maxlen) {
 	unsigned int i = 0;
 
 	// Read until newline or end of allocated space
-	while (1) {
-		c = getc();
-		printf("Got %x\r\n", (int)c);
-	}
 	while ( (c = getc() ) != 13 && i < maxlen) { 
 		if (c == 0x08) { // Handle backspace
 			if (i == 0) continue;
