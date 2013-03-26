@@ -1,1 +1,4 @@
 .*.swp
+.*.o
+disk1
+main

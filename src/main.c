@@ -2,6 +2,7 @@
 #include "shell.h"
 #include "string.h"
 #include "interrupts.h"
+#include "keyboard.h"
 
 struct int_vector old_int9, old_int16;
 

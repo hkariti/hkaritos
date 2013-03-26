@@ -4,9 +4,6 @@ void* get_int(unsigned char int_num, void** segment, void** offset);
 void* setup_int(unsigned char int_num, void* segment, void* offset);
 void* get_cs();
 
-void handle_int9();
-void handle_int16();
-
 struct int_vector {
 	void* segment;
 	void* offset;

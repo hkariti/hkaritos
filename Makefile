@@ -1,6 +1,10 @@
 SRCDIR := src
 INCLUDEDIR := include
 CFLAGS = -m32 -fno-builtin -nostdlib -I${INCLUDEDIR}
+AS = nasm
+ASFLAGS = -f elf
+
+BINFILES = boot.o interrupts.o keyboard.o main.o aux.o shell.o string.o mem.o
 
 .PHONY: all clean
 
@@ -23,29 +27,23 @@ loader: ${SRCDIR}/loader.s.m4 main
 	m4 -DSHELL_SIZE=$(shell du --apparent-size -B 512 main | awk '{print $$1}') ${SRCDIR}/loader.s.m4 > loader.s
 	nasm loader.s -o loader
 
-shell.o: ${SRCDIR}/shell.c ${INCLUDEDIR}/shell.h ${INCLUDEDIR}/common.h
-	gcc ${CFLAGS} -c ${SRCDIR}/shell.c -o shell.o
+shell.o: ${INCLUDEDIR}/shell.h
 
-string.o: ${SRCDIR}/string.c ${INCLUDEDIR}/string.h ${INCLUDEDIR}/common.h
-	gcc ${CFLAGS} -c ${SRCDIR}/string.c -o string.o
+string.o: ${INCLUDEDIR}/string.h
 
-mem.o: ${SRCDIR}/mem.c ${INCLUDEDIR}/mem.h ${INCLUDEDIR}/common.h
-	gcc ${CFLAGS} -c ${SRCDIR}/mem.c -o mem.o
+mem.o: ${INCLUDEDIR}/mem.h
 
-boot.o: ${SRCDIR}/boot.s
-	nasm ${SRCDIR}/boot.s -f elf -o boot.o
+main.o: ${INCLUDEDIR}/string.h ${INCLUDEDIR}/interrupts.h ${INCLUDEDIR}/shell.h ${INCLUDEDIR}/keyboard.h
 
-aux.o: ${SRCDIR}/aux.s
-	nasm ${SRCDIR}/aux.s -f elf -o aux.o
-
-interrupts.o: ${SRCDIR}/interrupts.s
-	nasm ${SRCDIR}/interrupts.s -f elf -o interrupts.o
-
-main.o: ${SRCDIR}/main.c ${INCLUDEDIR}/string.h ${INCLUDEDIR}/interrupts.h ${INCLUDEDIR}/shell.h ${INCLUDEDIR}/common.h
-	gcc ${CFLAGS} -c ${SRCDIR}/main.c -o main.o
-
-main: main.o link.ld aux.o boot.o shell.o string.o mem.o interrupts.o
-	ld -T link.ld -m elf_i386 -o main boot.o main.o aux.o shell.o string.o mem.o interrupts.o
+main: link.ld ${BINFILES}
+	ld -T link.ld -m elf_i386 -o main ${BINFILES}
 
 clean:
 	rm -f disk1 *.o loader* main 
+
+%.o : ${SRCDIR}/%.s
+	$(AS) $(ASFLAGS) $< -o $@
+
+%.o : ${SRCDIR}/%.c ${INCLUDEDIR}/common.h
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+
