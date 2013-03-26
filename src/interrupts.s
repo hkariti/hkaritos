@@ -64,11 +64,51 @@ get_int:
 	o32 ret
 
 handle_int9:
-	push word [old_int9] ; segment
-	push word [old_int9+4] ; offset
-	retf
+	pushad
+	xor ax, ax
+	xor bx, bx
+	mov bl, 8 ; buffer length
+	mov al, [kb_write_idx]
+	inc al	
+	div bl ; real index is in ah now
+	mov bl, ah
+	cmp ah, [kb_read_idx] ; Check if buffer is full
+	je int9_end
+	in al, 0x64
+	mov [kb_base + bx], al
+	mov [kb_write_idx], bl
+	
+int9_end:
+	; Send EOI to PIC
+	mov al, 0x20
+	out 0x20, al
+	popad
+	iret
 
 handle_int16:
-	push word [old_int16]
-	push word [old_int16+4]
-	retf
+	pushad
+	mov al, [kb_read_idx]
+
+int16_block:
+	; Wait for a key to be pressed if buffer is empty
+	cmp al, [kb_write_idx]
+	jne int16_end
+	sti
+	hlt
+	jmp int16_block
+
+int16_end:
+	xor ax, ax
+	xor bx, bx
+	mov bl, 8 ; buffer length
+	inc al	
+	div bl ; real index is in ah now
+	mov bl, ah
+	mov al, [kb_base + bx]
+	mov [kb_read_idx], bl
+	popad
+	iret
+
+kb_write_idx: db 0
+kb_read_idx: db 0
+kb_base: db 0, 0, 0, 0, 0, 0, 0, 0
