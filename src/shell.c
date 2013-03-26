@@ -1,6 +1,7 @@
 #include "shell.h"
 #include "string.h"
 #include "mem.h"
+#include "interrupts.h"
 
 // Prompt the user for a command {{{1
 void prompt() {

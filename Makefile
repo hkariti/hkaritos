@@ -38,11 +38,14 @@ boot.o: ${SRCDIR}/boot.s
 aux.o: ${SRCDIR}/aux.s
 	nasm ${SRCDIR}/aux.s -f elf -o aux.o
 
-main.o: ${SRCDIR}/main.c
+interrupts.o: ${SRCDIR}/interrupts.s
+	nasm ${SRCDIR}/interrupts.s -f elf -o interrupts.o
+
+main.o: ${SRCDIR}/main.c ${INCLUDEDIR}/string.h ${INCLUDEDIR}/interrupts.h ${INCLUDEDIR}/shell.h ${INCLUDEDIR}/common.h
 	gcc ${CFLAGS} -c ${SRCDIR}/main.c -o main.o
 
-main: main.o link.ld aux.o boot.o shell.o string.o mem.o 
-	ld -T link.ld -m elf_i386 -o main boot.o main.o aux.o shell.o string.o mem.o
+main: main.o link.ld aux.o boot.o shell.o string.o mem.o interrupts.o
+	ld -T link.ld -m elf_i386 -o main boot.o main.o aux.o shell.o string.o mem.o interrupts.o
 
 clean:
 	rm -f disk1 *.o loader* shell 

@@ -29,4 +29,3 @@ void print_cmd(int, char**);
 void get_int_cmd(int, char**);
 struct cmd_args* split_cmd(char*);
 
-void* get_int(unsigned char int_num, void** segment, void** offset);
