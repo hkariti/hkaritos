@@ -48,4 +48,4 @@ main: main.o link.ld aux.o boot.o shell.o string.o mem.o interrupts.o
 	ld -T link.ld -m elf_i386 -o main boot.o main.o aux.o shell.o string.o mem.o interrupts.o
 
 clean:
-	rm -f disk1 *.o loader* shell 
+	rm -f disk1 *.o loader* main 
